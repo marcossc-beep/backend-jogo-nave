@@ -29,3 +29,7 @@ Content-Type: application/json
     "mira": 2,
     "carisma": 1
 }
+
+### 
+
+DELETE http://localhost:3000/personagem/mario

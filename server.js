@@ -1,6 +1,12 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors'
 
 const server = Fastify()
+
+server.register(cors, {
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+})
 
 const lista = []
 
@@ -13,14 +19,24 @@ server.get('/personagem', () => {
 })
 
 server.post('/personagem', (req, reply) => {
-    lista.push(req.body)
-    return 'Deu certo!'
+    let valido = true;
+    for (let index in lista) {
+        if (req.body.nome === lista[index].nome) {
+            valido = false
+            break
+        }
+    }
+    if (valido) {
+        lista.push(req.body)
+        return 'Deu certo!'
+    } else {
+        return 'já existe um ' + req.body.nome
+    }
 })
 
 server.put('/personagem/:nome', (req, reply) => {
     const nome = req.params.nome;
-// Faça uma lógica para verificar se ja tem um personagem
-// Com esse nome. ( DENTRO DO ENDPOINT DO POST )
+
     let valido = false;
     for (let index in lista) {
         if (nome === lista[index].nome) {
@@ -30,6 +46,19 @@ server.put('/personagem/:nome', (req, reply) => {
     }
 
     return lista
+})
+
+server.delete('/personagem/:nome', (req, reply) => {
+    const nome = req.params.nome;
+    
+    for (let index in lista) {
+        if (nome === lista[index].nome) {
+            lista.splice(index, 1)
+            break
+        }
+    }
+
+    reply.status(201).send({message: 'Personagem deletado!'})
 })
 
 server.listen(
